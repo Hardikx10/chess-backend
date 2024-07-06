@@ -1,12 +1,17 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const ws_1 = __importDefault(require("ws"));
 const GameManager_1 = require("./GameManager");
-const port = 8080;
-const wss = new ws_1.default.Server({ port: port });
+const express = require('express');
+const { WebSocketServer } = require('ws');
+const cors = require('cors');
+require('dotenv').config();
+const app = express();
+const port = process.env.PORT || 8080;
+app.use(cors());
+const server = app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+});
+const wss = new WebSocketServer({ server });
 const gameManager = new GameManager_1.GameManager();
 wss.on('connection', function connection(socket) {
     socket.on('error', console.error);
@@ -19,4 +24,3 @@ wss.on('connection', function connection(socket) {
     //     });
     socket.on("disconnect", () => gameManager.removeUser(socket));
 });
-console.log(`WebSocket server is running on ws://localhost:8080`);

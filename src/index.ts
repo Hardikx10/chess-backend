@@ -1,14 +1,25 @@
-import express from 'express'
-import { WebSocketServer } from 'ws'
-import WebSocket from 'ws'
-import { GameManager } from './GameManager'
+import { WebSocket } from "ws";
+import { GameManager } from "./GameManager";
 
-const port = 8080
-const wss = new WebSocket.Server({ port:port });
+const express = require('express');
+const { WebSocketServer } = require('ws');
+const cors = require('cors');
+require('dotenv').config();
+
+const app = express();
+const port = process.env.PORT || 8080;
+
+app.use(cors());
+
+const server = app.listen(port, () => {
+  console.log(`Server is listening on port ${port}`);
+});
+
+const wss = new WebSocketServer({ server });
 
 const gameManager=new GameManager()
 
-wss.on('connection', function connection(socket) {
+wss.on('connection', function connection(socket: WebSocket) {
 
     socket.on('error', console.error);
 
@@ -22,4 +33,3 @@ wss.on('connection', function connection(socket) {
     socket.on("disconnect", () => gameManager.removeUser(socket))
 });
 
-console.log(`WebSocket server is running on ws://localhost:8080`);
