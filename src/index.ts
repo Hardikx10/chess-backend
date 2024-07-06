@@ -3,10 +3,8 @@ import { WebSocketServer } from 'ws'
 import WebSocket from 'ws'
 import { GameManager } from './GameManager'
 
-const app = express()
-const httpServer = app.listen(8080)
-
-const wss = new WebSocketServer({ server: httpServer });
+const port = 8080
+const wss = new WebSocket.Server({ port:port });
 
 const gameManager=new GameManager()
 
