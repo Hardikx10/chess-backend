@@ -37,5 +37,11 @@ wss.on('connection', function connection(socket: WebSocket) {
 //       }
 //     });
     socket.on("disconnect", () => gameManager.removeUser(socket))
+      // Clear the interval on disconnect
+    socket.on('close', () => {
+      console.log('Client disconnected');
+      clearInterval(keepAliveInterval);
+      gameManager.removeUser(socket);
+    });
 });
 
