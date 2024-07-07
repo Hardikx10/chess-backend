@@ -21,6 +21,12 @@ const gameManager=new GameManager()
 
 wss.on('connection', function connection(socket: WebSocket) {
 
+    const keepAliveInterval = setInterval(() => {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'keep-alive' }));
+      }
+    }, 30000); // Send a keep-alive message every 30 seconds
+
     socket.on('error', console.error);
 
     gameManager.addUser(socket)
