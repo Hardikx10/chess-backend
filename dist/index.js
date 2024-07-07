@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const ws_1 = require("ws");
 const GameManager_1 = require("./GameManager");
 const express = require('express');
 const { WebSocketServer } = require('ws');
@@ -14,6 +15,11 @@ const server = app.listen(port, () => {
 const wss = new WebSocketServer({ server });
 const gameManager = new GameManager_1.GameManager();
 wss.on('connection', function connection(socket) {
+    const keepAliveInterval = setInterval(() => {
+        if (socket.readyState === ws_1.WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: 'keep-alive' }));
+        }
+    }, 30000); // Send a keep-alive message every 30 seconds
     socket.on('error', console.error);
     gameManager.addUser(socket);
     //   socket.on('message', function message(data, isBinary) {
@@ -23,4 +29,10 @@ wss.on('connection', function connection(socket) {
     //       }
     //     });
     socket.on("disconnect", () => gameManager.removeUser(socket));
+    // Clear the interval on disconnect
+    socket.on('close', () => {
+        console.log('Client disconnected');
+        clearInterval(keepAliveInterval);
+        gameManager.removeUser(socket);
+    });
 });
